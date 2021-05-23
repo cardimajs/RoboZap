@@ -8,19 +8,81 @@ const mapearCsv = async ({nomeArquivo}) => {
     columns: true,
     skip_empty_lines: true
   });
-  return listaDeContatos;
+  return listaDeContatos.map( contato => ({
+    ...contato,
+    Idade: parseInt(contato.Idade)
+  }));
 }
 
 const filtrarChamado = ({listaDeContatos, chamados}) => {
-  // https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-  const chamadosFiltrados = listaDeContatos.filter( contato => chamados.includes(contato.Chamado) );
-  return chamadosFiltrados;
+  const contatosFiltrados = listaDeContatos.filter( contato => chamados.includes(contato.Chamado) );
+  return contatosFiltrados;
+}
+
+const filtrarDinamico = ({listaDeContatos, filtros}) => {
+  // gt  -> greater than -> maior que
+  // gte -> greater than or equal -> maior que ou igual
+  // eq  -> equal to -> igual
+  // lt  -> less than -> menor que
+  // lte -> less than or equal -> menor que ou igual
+  // incl -> includes -> inclui
+
+  const contatosFiltrados = listaDeContatos.filter( (contato) => {
+
+    for ( campo of Object.keys(filtros) ) {
+      for( filtro of Object.keys(filtros[campo])){
+        if(filtro === 'eq'){
+          if(!(contato[campo] === filtros[campo][filtro])){
+            return false;
+          }
+        } else if(filtro === 'gt') {
+          if(!(contato[campo] > filtros[campo][filtro])){
+            return false;
+          }
+        }
+        else if(filtro === 'gte') {
+          if(!(contato[campo] >= filtros[campo][filtro])){
+            return false;
+          }
+        } else if(filtro === 'lt') {
+          if(!(contato[campo] < filtros[campo][filtro])){
+            return false;
+          }
+        }
+        else if(filtro === 'lte') {
+          if(!(contato[campo] <= filtros[campo][filtro])){
+            return false;
+          }
+        } else if(filtro === 'incl') {
+          if(!filtros[campo][filtro].includes(contato[campo])){
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  });
+  return contatosFiltrados;
 }
 
 
 const main = async () => {
   const listaDeContatos = await mapearCsv({nomeArquivo: 'data.csv'});
-  const contatosFiltrados = filtrarChamado({listaDeContatos, chamados: ['Bispo']});
+  // const contatosFiltrados = filtrarChamado({listaDeContatos, chamados: ['Bispo']});
+  const contatosFiltrados = filtrarDinamico({listaDeContatos, filtros: {
+    Chamado: {
+      eq: 'Bispo',
+      // incl: ['Conselheiro', 'Bispo']
+    },
+    Idade: {
+      gte: 20, //maior ou igual a 20
+      // incl: [20, 21]
+      lte: 30 //menor ou igual a 30
+    }
+  }});
   console.log(contatosFiltrados);
 }
 main();
+
+
+
