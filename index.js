@@ -1,6 +1,7 @@
 const fs = require("fs").promises;
 const parse = require("csv-parse/lib/sync");
 const Mustache = require("mustache");
+const venom = require('venom-bot')
 
 // le o csv e transforma em objeto
 const mapearCsv = async ({ nomeArquivo }) => {
