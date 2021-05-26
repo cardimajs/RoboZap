@@ -16,13 +16,6 @@ const mapearCsv = async ({ nomeArquivo }) => {
   }));
 };
 
-const filtrarChamado = ({ listaDeContatos, chamados }) => {
-  const contatosFiltrados = listaDeContatos.filter((contato) =>
-    chamados.includes(contato.Chamado)
-  );
-  return contatosFiltrados;
-};
-
 const filtrarDinamico = ({ listaDeContatos, filtros }) => {
   // gt  -> greater than -> maior que
   // gte -> greater than or equal -> maior que ou igual
@@ -72,27 +65,26 @@ const gerarTextTemplate = ({ template, dados }) => {
 
 const main = async () => {
   const listaDeContatos = await mapearCsv({ nomeArquivo: "data.csv" });
-  // const contatosFiltrados = filtrarChamado({listaDeContatos, chamados: ['Bispo']});
   const contatosFiltrados = filtrarDinamico({
     listaDeContatos,
-    filtros: {
-      Chamado: {
-        eq: "Bispo",
-        // incl: ['Conselheiro', 'Bispo']
-      },
-      Idade: {
-        gte: 20, //maior ou igual a 20
-        // incl: [20, 21]
-        lte: 30, //menor ou igual a 30
-      },
-    },
+    // filtros: { Chamado: { eq: "Bispo",}},
+    filtros: { Chamado: { eq: "asd",}}
   });
-  // console.log(contatosFiltrados);
-  const mensagem = gerarTextTemplate({
-    template: "Ola {{Nome}}, {{Chamado}} seja bem-vindo",
-    dados: contatosFiltrados[0],
-  });
-  console.log(mensagem);
+
+
+  const client = await venom.create();
+
+  for (emersongado of contatosFiltrados) {
+    const mensagem = gerarTextTemplate({
+      template: "Ola {{Nome}}, {{Chamado}}, {{Telefone}} seja bem-vindo",
+      dados: emersongado,
+    });
+
+    const telefone = `${emersongado.Telefone}@c.us`;
+    console.log(telefone)
+
+    await client.sendText(`${emersongado.Telefone}@c.us`, mensagem); 
+  }
 };
 
 main();
