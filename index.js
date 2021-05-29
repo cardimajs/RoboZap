@@ -65,25 +65,27 @@ const gerarTextTemplate = ({ template, dados }) => {
 
 const main = async () => {
   const listaDeContatos = await mapearCsv({ nomeArquivo: "data.csv" });
+
   const contatosFiltrados = filtrarDinamico({
     listaDeContatos,
-    // filtros: { Chamado: { eq: "Bispo",}},
-    filtros: { Chamado: { eq: "asd",}}
+    filtros: { Idade: { gte: 10,}}
   });
-
-
+  
   const client = await venom.create();
 
-  for (emersongado of contatosFiltrados) {
+  for(contato of contatosFiltrados){
     const mensagem = gerarTextTemplate({
-      template: "Ola {{Nome}}, {{Chamado}}, {{Telefone}} seja bem-vindo",
-      dados: emersongado,
-    });
-
-    const telefone = `${emersongado.Telefone}@c.us`;
-    console.log(telefone)
-
-    await client.sendText(`${emersongado.Telefone}@c.us`, mensagem); 
+      template: "Olá {{Nome}}, vocÊ tem {{Idade}} anos", 
+      dados: contato
+    })
+    console.log(mensagem)
+    console.log(contato.Telefone)
+    try {
+      await client.sendText(`${contato.Telefone}@c.us`, mensagem); 
+    }
+    catch(err){
+      console.log('erro ao enviar mensagem');
+    }
   }
 };
 
