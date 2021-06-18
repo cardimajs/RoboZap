@@ -63,25 +63,39 @@ const gerarTextTemplate = ({ template, dados }) => {
   return Mustache.render(template, dados);
 };
 
+
+const cleanPhone = (phone) => {
+  return '55' + phone.replaceAll('(', '').replaceAll(')', '').replaceAll('-', '').replaceAll(' ', '');
+}
+
 const main = async () => {
   const listaDeContatos = await mapearCsv({ nomeArquivo: "data.csv" });
+  console.log(`total de ${listaDeContatos.length}`);
 
   const contatosFiltrados = filtrarDinamico({
     listaDeContatos,
-    filtros: { Idade: { gte: 10,}}
+    filtros: { CHAMADO: { incl: [
+      
+    ]}}
   });
+
+  console.log(`contatos filtrados ${contatosFiltrados.length}`);
   
   const client = await venom.create();
 
   for(contato of contatosFiltrados){
     const mensagem = gerarTextTemplate({
-      template: "Olá {{Nome}}, vocÊ tem {{Idade}} anos", 
+      template: `
+      `, 
       dados: contato
     })
-    console.log(mensagem)
-    console.log(contato.Telefone)
+    // console.log(mensagem)
+    
+    const phone = cleanPhone(contato.FONE)
+    console.log(phone)
     try {
-      await client.sendText(`${contato.Telefone}@c.us`, mensagem); 
+      await client.sendImage(`${phone}@c.us`, './img1.jpeg')
+      await client.sendText(`${phone}@c.us`, mensagem); 
     }
     catch(err){
       console.log('erro ao enviar mensagem');
