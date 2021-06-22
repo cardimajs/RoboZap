@@ -7,8 +7,7 @@ import { Button } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-// import IconButton from '@material-ui/core/IconButton';
-// import MenuIcon from '@material-ui/icons/Menu';
+
 import CssBaseline from '@material-ui/core/CssBaseline';
 import XLSX from 'xlsx';
 import { useForm, Controller } from "react-hook-form";
@@ -24,12 +23,13 @@ import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-// import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
+import AddMessageModal from './AddMessageModal';
 
 function App() {
 
   const [sheet, setSheet] = useState();
+  const [openMessage, setOpenMessage] = useState(false);
 
   const { handleSubmit, control, register } = useForm({phoneField: 'Telefone'});
 
@@ -54,8 +54,13 @@ function App() {
     fileReader.readAsBinaryString(event.target.files[0]);
   }
 
+  const handleMessageModal = () => {
+    setOpenMessage(!openMessage);
+  }
+
   return (
     <>
+    <AddMessageModal open={openMessage} onClose={handleMessageModal}/>
       <CssBaseline />
         <AppBar position="static">
           <Toolbar>
@@ -80,38 +85,40 @@ function App() {
             color="primary" 
             component="span"
             css={css`
-            background-color: green;
+            background-color: blue;
             color: #fff;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11),
+              0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 7px 14px;
+            &:hover {
+              background-color: blue;
+            }
+          `}
+          >
+            Carregar Planilha
+          </Button>
+            <Button
+              variant="contained"
+              onClick={handleMessageModal}
+              css={css`
+                background-color: green;
+                color: #fff;
+            
             box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11),
               0 1px 3px rgba(0, 0, 0, 0.08);
             padding: 7px 14px;
             &:hover {
               background-color: green;
             }
-          `}
-          >
-            Carregar Planilha
-          </Button>
+              `}
+            >
+              Add Message</Button>
+          <Button />
         </label>
 
         {sheet?.data && 
           <>
-
             <form onSubmit={handleSubmit(onSubmit)}>
-              {/* <Controller
-                name="phoneField"
-                control={control}
-                defaultValue=""
-                render={({field}) => (
-                  <Select {...field}>
-                    <MenuItem value="">None</MenuItem>
-                    {sheet.header.map((cell) => (
-                      <MenuItem key={JSON.stringify(cell)} value={cell}>{cell}</MenuItem>
-                    ))}
-                  </Select>
-                )}
-              /> */}
-
               <FormControl variant="outlined">
                 <InputLabel id="demo-simple-select-outlined-label">Age</InputLabel>
                 <Select
@@ -148,7 +155,6 @@ function App() {
               >
                 Enviar Mensagens
               </Button>
-
             </form>
 
             <TableContainer component={Paper}>
@@ -173,9 +179,6 @@ function App() {
             </TableContainer>
 </>
   }
-
-
-
     </>
   );
 }
